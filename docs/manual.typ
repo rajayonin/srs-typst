@@ -10,7 +10,8 @@
       // we use the old (0.3) syntax bc Tynimist does not support the new one
       // when it's supported, we'll have to migrate, as the new parser supports
       // argument sinks (variadic functions) documentation
-      old-syntax: true
-    )
+      old-syntax: true,
+    ),
+    omit-private-definitions: true,
   )
 }
