@@ -51,9 +51,9 @@
 #let content-field = "content"
 
 
-/// Encapsulates a terminal class, by showing its hierarchy.
+/// An unique identifier of an item and/or class, composed of its class path.
 ///
-/// Each hierarchy is specified by the IDs of the respective classes.
+/// Each class is specified by the its ID.
 ///
 /// *Example:*
 /// ```
@@ -77,9 +77,9 @@
 #let make-class(
   id,
   name,
-  fields: (:),
-  classes: (:),
-  origins: (:),
+  fields: (),
+  classes: (),
+  origins: (),
 ) = {
   // TODO: more parameter validation
   assert(
@@ -92,6 +92,7 @@
     name: name,
     classes: classes,
     fields: fields,
+    origins: origins
   )
 }
 
@@ -128,8 +129,8 @@
 /// -> dictionary
 #let make-origins(
   description,
-  ..origins,
+  ..tags,
 ) = (
   description: description,
-  origins: origins.pos(),
+  tags: tags.pos(),
 )
