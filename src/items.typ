@@ -85,7 +85,6 @@
 /// - class_origins (array): Item class's origins to validate against.
 /// -> array
 #let _validate-origins(item_origins, class_origins, tree) = {
-
   if item_origins.len() == 0 { return (true, none) }
 
   if class_origins.len() == 0 {
@@ -144,7 +143,7 @@
 /// - tree (dictionary): Current item tree.
 /// -> array
 #let _validate-item(item, config, tree) = {
-  // check format
+  // check format (duck typing)
   if (
     (type(item) != dictionary) or item.keys() != ("id", "class", "origins", "fields")
   ) {
@@ -300,7 +299,9 @@
   config: default-config,
   ..items,
 ) = {
-  assert(validate-config(config), message: "Invalid configuration")
+  // validate configuration
+  let (ok, err) = validate-config(config)
+  assert(ok, message: "Invalid configuration: " + err)
 
   let tree = _create-tree-from-config(config)
 

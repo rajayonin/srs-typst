@@ -185,8 +185,8 @@
       ),
       make-field(
         "Evaluation",
-        [Result of the test],
         make-enum-field(ok: "OK", err: "Error"),
+        [Result of the test],
       ),
     ),
     classes: (
@@ -214,7 +214,7 @@
 
 
 /// Simple configuration.
-/// 
+///
 /// Includes:
 /// - Requirement (R)
 ///   - User Requirement (U)
