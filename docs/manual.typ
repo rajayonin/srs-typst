@@ -2,7 +2,7 @@
 
 
 
-#for module in ("config", "defaults", "tree") {
+#for module in ("config", "defaults", "items") {
   tidy.show-module(
     tidy.parse-module(
       read("/src/" + module + ".typ"),

@@ -185,8 +185,8 @@
       ),
       make-field(
         "Evaluation",
-        [Result of the test],
         make-enum-field(ok: "OK", err: "Error"),
+        [Result of the test],
       ),
     ),
     classes: (
@@ -199,22 +199,22 @@
           make-tag("R", "S", "NF"),
         ),
       ),
-    ),
-  ),
-  make-class(
-    "VET",
-    "Verification Test",
-    origins: make-origins(
-      [Requirement that originated this test.],
-      make-tag("R", "U", "CA"),
-      make-tag("R", "U", "RE"),
+      make-class(
+        "VET",
+        "Verification Test",
+        origins: make-origins(
+          [Requirement that originated this test.],
+          make-tag("R", "U", "CA"),
+          make-tag("R", "U", "RE"),
+        ),
+      ),
     ),
   ),
 )
 
 
 /// Simple configuration.
-/// 
+///
 /// Includes:
 /// - Requirement (R)
 ///   - User Requirement (U)
