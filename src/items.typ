@@ -61,6 +61,9 @@
   // check values
   for (key, value) in item_fields.pairs() {
     let field = class_fields.find(f => f.name == key)
+    if field == none {
+      return (false, "Invalid field '" + key + "'.")
+    }
 
     if field.value == "content" and type(value) != content {
       return (false, "Field '" + field.name + "' is not of type `content`.")
@@ -255,12 +258,7 @@
         )
       }
 
-      current
-        .at(class_id)
-        .insert(
-          item.id,
-          (origins: item.origins, fields: item.fields),
-        )
+      current.at(class_id).insert(item.id, (origins: item.origins, fields: item.fields))
 
       // re-build the tree
       for (j, node) in stack.enumerate().rev() {
@@ -311,7 +309,7 @@
     let (ok, err) = _validate-item(item, config, tree)
     assert(
       ok,
-      message: "Invalid item " + item.at("id", default: i) + ": " + err,
+      message: "Invalid item '" + item.at("id", default: i) + "': " + err,
     )
 
     tree = _add-item(item, tree)
