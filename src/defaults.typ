@@ -65,7 +65,7 @@
       make-field(
         "Verifiability",
         _scale-type,
-        [Ability to thest the vailidity of the requirement],
+        [Ability to test the vailidity of the requirement],
       ),
     ),
     classes: (
