@@ -40,26 +40,37 @@
   if type(class.name) != str {
     return (
       false,
-      "Invalid class '" + class.id + "': Invalid format. `name` is not a string.",
+      "Invalid class '"
+        + class.id
+        + "': Invalid format. `name` is not a string.",
     )
   }
 
   if type(class.classes) != array {
     return (
       false,
-      "Invalid class '" + class.id + "': Invalid format. `classes` is not an array.",
+      "Invalid class '"
+        + class.id
+        + "': Invalid format. `classes` is not an array.",
     )
   }
 
   if type(class.fields) != array {
     return (
       false,
-      "Invalid class '" + class.id + "': Invalid format. `fields` is not an array.",
+      "Invalid class '"
+        + class.id
+        + "': Invalid format. `fields` is not an array.",
     )
   }
 
   if type(class.origins) != dictionary {
-    return (false, "Invalid class '" + class.id + "': Invalid format. `origins` is not a dictionary.")
+    return (
+      false,
+      "Invalid class '"
+        + class.id
+        + "': Invalid format. `origins` is not a dictionary.",
+    )
   }
 
 
@@ -79,7 +90,11 @@
         if current == none {
           return (
             false,
-            "Invalid class '" + class.id + "'. Origin class '" + origin.join("-") + "' not found.",
+            "Invalid class '"
+              + class.id
+              + "'. Origin class '"
+              + origin.join("-")
+              + "' not found.",
           )
         }
       }
@@ -107,6 +122,18 @@
 #let validate-config(
   config,
 ) = {
+  // validate formatters
+  let item-formatter = config.at("item-formatter", default: none)
+  if item-formatter != none and type(item-formatter) != function {
+    return (false, "Invalid 'item-formatter'.")
+  }
+  let template-formatter = config.at("template-formatter", default: none)
+  if template-formatter != none and type(template-formatter) != function {
+    return (false, "Invalid 'template-formatter'.")
+  }
+
+  // TODO: validate language
+
   // validate classes
   for class in config.classes {
     let (ok, err) = _validate-class(class, config)
@@ -120,11 +147,21 @@
 /// Creates a configuration object from SRS classes.
 ///
 /// Each class must be generated using `make-class`.
+/// - language (str, none):
+/// - item-formatter (function, none): Default formatter for items, of form `(class, item, id, index) -> content`.
+/// - template-formatter (function, none): Default formatter for templates, of form `(class, item, id, index) -> content`
+/// - classes (array): Classes to use.
 /// -> dictionary
 #let make-config(
-  ..classes,
+  language: none, // TODO: this does nothing, for now
+  item-formatter: none,
+  template-formatter: none,
+  classes: (),
 ) = (
-  classes: classes.pos(),
+  language: language,
+  item-formatter: item-formatter,
+  template-formatter: template-formatter,
+  classes: classes,
 )
 
 
@@ -192,8 +229,14 @@
   // parameter validation
   assert(type(id) == str, message: "Invalid format. `id` is not a string.")
   assert(type(name) == str, message: "Invalid format. `name` is not a string.")
-  assert(type(fields) == array, message: "Invalid format. `fields` is not an array.")
-  assert(type(classes) == array, message: "Invalid format. `classes` is not an array.")
+  assert(
+    type(fields) == array,
+    message: "Invalid format. `fields` is not an array.",
+  )
+  assert(
+    type(classes) == array,
+    message: "Invalid format. `classes` is not an array.",
+  )
 
   // check origins
   assert(
@@ -232,7 +275,10 @@
 ) = {
   // parameter validation
   assert(type(name) == str, message: "Invalid format. `name` is not a string.")
-  assert(type(description) == content, message: "Invalid format. `description` is not content.")
+  assert(
+    type(description) == content,
+    message: "Invalid format. `description` is not content.",
+  )
   assert(
     type(value) == dictionary or value == content-field,
     message: "Invalid format of `value`. Please use `make-enum-field` or `content-field`.",
@@ -257,11 +303,20 @@
   ..tags,
 ) = {
   // parameter validation
-  assert(type(description) == content, message: "Invalid format. `description` is not content.")
+  assert(
+    type(description) == content,
+    message: "Invalid format. `description` is not content.",
+  )
   for (i, tag) in tags.pos().enumerate() {
-    assert(type(tag) == array, message: "Invalid tag format. Tag " + str(i) + " is not an array.")
+    assert(
+      type(tag) == array,
+      message: "Invalid tag format. Tag " + str(i) + " is not an array.",
+    )
     for c in tag {
-      assert(type(c) == str, message: "Invalid tag format. Tag " + str(i) + " is not a valid tag.")
+      assert(
+        type(c) == str,
+        message: "Invalid tag format. Tag " + str(i) + " is not a valid tag.",
+      )
     }
   }
 

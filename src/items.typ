@@ -1,6 +1,5 @@
 //! Functions for creating and managing items
 
-#import "defaults.typ": default-config
 #import "config.typ": validate-config
 
 
@@ -317,9 +316,11 @@
 
 
 #let create(
-  config: default-config,
+  config: none,
   ..items,
 ) = {
+  assert(config != none, message: "Missing argument 'config'")
+
   // validate configuration
   let (ok, err) = validate-config(config)
   assert(ok, message: "Invalid configuration: " + err)

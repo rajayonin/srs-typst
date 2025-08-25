@@ -1,7 +1,4 @@
-//! Default variables to be used by the user
-
-#import "config.typ": *
-
+#import "../config.typ": *
 
 
 #let _scale-type = make-enum-field(
@@ -18,8 +15,10 @@
 )
 
 
+// TODO: locale
 
-/// Default configuration.
+
+/// Base class set.
 ///
 /// Includes:
 /// - Requirement (R)
@@ -35,8 +34,8 @@
 ///   - Verification (VET)
 ///   - Validation (VAT)
 ///
-/// -> dictionary
-#let default-config = make-config(
+/// -> array
+#let base-classes = (
   make-class(
     "R",
     "Requirement",
@@ -59,8 +58,8 @@
       make-field(
         "Stability",
         _stability-type,
-        [Indicates the requirement's variability through the
-          development process],
+        [Indicates the requirement's variability through the development
+          process],
       ),
       make-field(
         "Verifiability",
@@ -213,7 +212,7 @@
 )
 
 
-/// Simple configuration.
+/// Simple classes set.
 ///
 /// Includes:
 /// - Requirement (R)
@@ -222,8 +221,8 @@
 ///     - Functional (FN)
 ///     - Non-Functional (NF)
 ///
-/// -> dictionary
-#let simple-config = make-config(
+/// -> array
+#let simple-classes = (
   make-class(
     "R",
     "Requirements",

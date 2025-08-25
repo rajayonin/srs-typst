@@ -1,7 +1,12 @@
 #import "/src/lib.typ" as srs
 
-#srs.create(
-  config: srs.default-config,
+
+#let reqs = srs.create(
+  config: srs.make-config(
+    item-formatter: srs.defaults.basic-item-formatter,
+    template-formatter: srs.defaults.basic-template-formatter,
+    classes: srs.defaults.base-classes,
+  ),
   srs.make-item(
     "user-req",
     srs.make-tag("R", "U", "RE"),
@@ -22,3 +27,12 @@
     Verifiability: "l",
   ),
 )
+
+#srs.show-template(reqs, srs.make-tag("R", "U"))
+
+@srs:user-template
+
+#srs.show-items(reqs, srs.make-tag("R", "U", "RE"))
+
+@srs:R-U-RE-user-req
+
