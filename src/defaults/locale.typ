@@ -1,14 +1,20 @@
+//! Localization support
+
+
+#let SUPPORTED-LANGUAGES = ("en", "es")
+
+
 #let TEMPLATE = (
-  "en": (name, root-class) => { ["#name" #root-class template] },
-  "es": (name, root-class) => { [Plantilla de #root-class "#name"] },
+  en: (name, root-class) => { ["#name" #root-class template] },
+  es: (name, root-class) => { [Plantilla de #root-class "#name"] },
 )
 
 #let FIELD = (
-  "en": "Field",
-  "es": "Campo",
+  en: "Field",
+  es: "Campo",
 )
 
 #let DESCRIPTION = (
-  "en": "Description",
-  "es": "Descripción",
+  en: "Description",
+  es: "Descripción",
 )

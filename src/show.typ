@@ -60,7 +60,7 @@
 ///
 /// - reqs (dictionary): Requirements object.
 /// - tag (array): Item class tag, use `make-tag` to generate it. Must be a terminal class.
-/// - formatter (function, auto): Formatter function, of format `(class, item, id, index) -> content`. If `auto`, it uses the configuration's default `template-formatter`.
+/// - formatter (function, auto): Formatter function, of format `(class: dictionary, language: str | none) -> content`. If `auto`, it uses the configuration's default `template-formatter`.
 /// -> content
 #let show-template(reqs, tag, formatter: auto) = {
   if formatter == auto {
@@ -74,14 +74,14 @@
 
   let class = _full-class(reqs.config, tag)
   let items = _get-all-items(reqs, tag)
-  return formatter(class)
+  return formatter(class, reqs.config.at("language", default: none))
 }
 
 /// Shows the items belonging to the specified class tag.
 ///
 /// - reqs (dictionary): Requirements object.
 /// - tag (array): Item class tag, use `make-tag` to generate it. Must be a terminal class.
-/// - formatter (function, auto): Formatter function, of format `(class, item, id, index) -> content`. If `auto`, it uses the configuration's default `item-formatter`.
+/// - formatter (function, auto): Formatter function, of format `(class: dictionary, item: dictionary, id: str, index: int, language: str | none) -> content`. If `auto`, it uses the configuration's default `item-formatter`.
 /// -> content
 #let show-items(reqs, tag, formatter: auto) = {
   if formatter == auto {
@@ -101,12 +101,12 @@
     mapi(
       items.pairs().filter(x => x.last().len() != 0), // filter out empty classes
       (pair, index) => {
-        // ignore empty
         formatter(
           class,
           pair.last(),
           pair.first(),
           index,
+          reqs.config.at("language", default: none),
         )
       },
     ).join([])

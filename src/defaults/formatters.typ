@@ -87,26 +87,38 @@
 ///
 /// - namer (function): Function to format the item's name, of form `(class, item, id, index) -> str`.
 /// - tagger (function): Function to format the item's tag, of form `(class, item, id, index) -> str`.
-/// - language (str): Language of the captions.
+/// - language (str, auto): Language of the captions. If `auto`, it will use the one in `config.language`
 /// - breakable (bool): If the table can be broken in several pages.
 /// - style (dictionary): Parameters to pass to the table, e.g. `(columns: (1fr, 1fr), gutter: 1em)`
 /// -> function
 #let table-item-formatter-maker(
   namer: none,
   tagger: none,
-  language: "en",
+  language: auto,
   breakable: true,
   style: (columns: 2),
-) = (class, item, id, index) => {
-  table-formatter(
-    class,
-    item,
-    tagger(class, item, id, index),
-    [#class.root-class-name "#namer(class, item, id, index)"],
-    language,
-    breakable,
-    style: style,
-  )
+) = {
+  (class, item, id, index, conf-language) => {
+    // handle automatic language
+    let lang = language
+    if language == auto {
+      assert(
+        conf-language != none,
+        message: "Can't set `language` to `auto`. Found no `language` in the configuration",
+      )
+      lang = conf-language
+    }
+
+    table-formatter(
+      class,
+      item,
+      tagger(class, item, id, index),
+      [#class.root-class-name "#namer(class, item, id, index)"],
+      lang,
+      breakable,
+      style: style,
+    )
+  }
 }
 
 
@@ -116,22 +128,32 @@
 ///
 /// - tagger (function): Function to format the item's tag, of form `(class, item, id, index) -> str`.
 /// - breakable (bool): If the table can be broken in several pages.
-/// - language (str): Language of the captions.
+/// - language (str, auto): Language of the captions. If `auto`, it will use the one in `config.language`
 /// - style (dictionary): Parameters to pass to the table, e.g. `(columns: (1fr, 1fr), gutter: 1em)`
 /// -> function
 #let table-template-formatter-maker(
   tagger: none,
   breakable: true,
-  language: "en", // TODO: default to auto, if auto get from config
+  language: auto,
   style: (columns: (8em, 1fr)),
 ) = {
-  class => {
+  (class, conf-language) => {
+    // handle automatic language
+    let lang = language
+    if language == auto {
+      assert(
+        conf-language != none,
+        message: "Can't set `language` to `auto`. Found no `language` in the configuration",
+      )
+      lang = conf-language
+    }
+
     table-formatter(
       class,
       _class-as-template-item(class),
       tagger(class),
-      locale.TEMPLATE.at(language)(class.name, lower(class.root-class-name)),
-      language,
+      locale.TEMPLATE.at(lang)(class.name, lower(class.root-class-name)),
+      lang,
       breakable,
       style: style,
     )

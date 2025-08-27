@@ -1,6 +1,9 @@
 //! Functions for creating and managing the configuration of the package
 
 
+#import "defaults/locale.typ": SUPPORTED-LANGUAGES
+
+
 
 /// Validates a class object.
 ///
@@ -132,7 +135,21 @@
     return (false, "Invalid 'template-formatter'.")
   }
 
-  // TODO: validate language
+  // TODO: more in-depht formatter validation, perhaps testing the function?
+
+  // validate language
+  let lang = config.at("language", default: none)
+  assert(
+    lang == none or type(lang) == str,
+    message: "Invalid type for 'language'. Expected 'str' or 'none', got '"
+      + str(type(lang))
+      + "'.",
+  )
+  assert(
+    lang == none or SUPPORTED-LANGUAGES.contains(lang),
+    message: "Unsupported language '" + lang + "'.",
+  )
+
 
   // validate classes
   for class in config.classes {
@@ -148,12 +165,12 @@
 ///
 /// Each class must be generated using `make-class`.
 /// - language (str, none):
-/// - item-formatter (function, none): Default formatter for items, of form `(class, item, id, index) -> content`.
-/// - template-formatter (function, none): Default formatter for templates, of form `(class, item, id, index) -> content`
+/// - item-formatter (function, none): Default formatter for items, of form `(class: dictionary, item: dictionary, id: str, index: int) -> content`.
+/// - template-formatter (function, none): Default formatter for templates, of form `(class: dictionary) -> content`
 /// - classes (array): Classes to use.
 /// -> dictionary
 #let make-config(
-  language: none, // TODO: this does nothing, for now
+  language: none,
   item-formatter: none,
   template-formatter: none,
   classes: (),

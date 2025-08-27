@@ -3,6 +3,7 @@
 
 #let reqs = srs.create(
   config: srs.make-config(
+    language: "en",
     item-formatter: srs.defaults.basic-item-formatter,
     template-formatter: srs.defaults.basic-template-formatter,
     classes: srs.defaults.base-classes,

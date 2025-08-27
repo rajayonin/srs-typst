@@ -18,6 +18,7 @@
 
 #let reqs = srs.create(
   config: srs.make-config(
+    language: "es",
     item-formatter: srs.defaults.table-item-formatter-maker(
       namer: srs.defaults.incremental-namer-maker(
         prefix: (class, separator) => { class.tag.slice(1).join(separator) },
