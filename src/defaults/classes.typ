@@ -34,8 +34,8 @@
 ///   - Verification (VET)
 ///   - Validation (VAT)
 ///
-/// -> array
-#let base-classes = (
+/// -> function
+#let base-classes = language => (
   make-class(
     "R",
     "Requirement",
@@ -221,8 +221,8 @@
 ///     - Functional (FN)
 ///     - Non-Functional (NF)
 ///
-/// -> array
-#let simple-classes = (
+/// -> language
+#let simple-classes = language => (
   make-class(
     "R",
     "Requirements",

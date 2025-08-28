@@ -120,7 +120,7 @@
 /// It returns a result. That is, a pair `(ok, err)` where `ok` is the result of
 /// the operation and `err` is the error message in case of error.
 ///
-/// - config (dictionary): Configuration object. Generate it using `make-field`.
+/// - config (dictionary): Configuration object. Generate it using `make-config`.
 /// -> array
 #let validate-config(
   config,
@@ -138,15 +138,15 @@
   // TODO: more in-depht formatter validation, perhaps testing the function?
 
   // validate language
-  let lang = config.at("language", default: none)
+  let lang = config.at("language", default: "en")
   assert(
-    lang == none or type(lang) == str,
-    message: "Invalid type for 'language'. Expected 'str' or 'none', got '"
+    type(lang) == str,
+    message: "Invalid type for 'language'. Expected 'str', got '"
       + str(type(lang))
       + "'.",
   )
   assert(
-    lang == none or SUPPORTED-LANGUAGES.contains(lang),
+    SUPPORTED-LANGUAGES.contains(lang),
     message: "Unsupported language '" + lang + "'.",
   )
 
@@ -164,22 +164,28 @@
 /// Creates a configuration object from SRS classes.
 ///
 /// Each class must be generated using `make-class`.
-/// - language (str, none):
+/// - language (str): Language to use. Applies to the defaults.
 /// - item-formatter (function, none): Default formatter for items, of form `(class: dictionary, item: dictionary, id: str, index: int) -> content`.
 /// - template-formatter (function, none): Default formatter for templates, of form `(class: dictionary) -> content`
-/// - classes (array): Classes to use.
+/// - classes (array, function): Classes to use. If function, it takes the form `(language: str) -> array`, and will be passed the language.
 /// -> dictionary
 #let make-config(
-  language: none,
+  language: "en",
   item-formatter: none,
   template-formatter: none,
   classes: (),
-) = (
-  language: language,
-  item-formatter: item-formatter,
-  template-formatter: template-formatter,
-  classes: classes,
-)
+) = {
+  let cls = if type(classes) == function {
+    classes(language)
+  } else { classes }
+
+  (
+    language: language,
+    item-formatter: item-formatter,
+    template-formatter: template-formatter,
+    classes: cls,
+  )
+}
 
 
 /// Encapsulates an enum field.
