@@ -40,6 +40,7 @@
 /// - caption (content, str): The table's caption
 /// - language (str): Language to use.
 /// - breakable (bool): Whether the table can span multiple pages.
+/// - justify (array): Justification of the two columns, e.g. (true, false)
 /// - style (dictionary): Parameters to pass to the table, e.g. `(columns: (1fr, 1fr), gutter: 1em)`
 /// -> content
 #let table-formatter(
@@ -48,11 +49,13 @@
   tag,
   caption,
   language,
-  breakable,
+  breakable: false,
+  justify: (false, true),
   style: (columns: 2),
 ) = {
   show figure: set block(breakable: breakable)
-  // show table.cell.where(x: 0): set par(justify: false)
+  show table.cell.where(x: 0): set par(justify: justify.at(0))
+  show table.cell.where(x: 1): set par(justify: justify.at(1))
 
   let contents = ()
   for field in class.fields {
@@ -89,15 +92,19 @@
 /// - tagger (function): Function to format the item's tag, of form `(class, item, id, index) -> str`.
 /// - language (str, auto): Language of the captions. If `auto`, it will use the one in `config.language`
 /// - breakable (bool): If the table can be broken in several pages.
+/// - justify (array): Justification of the two columns, e.g. (true, false)
 /// - style (dictionary): Parameters to pass to the table, e.g. `(columns: (1fr, 1fr), gutter: 1em)`
 /// -> function
 #let table-item-formatter-maker(
   namer: none,
   tagger: none,
   language: auto,
-  breakable: true,
+  breakable: false,
+  justify: (false, true),
   style: (columns: 2),
 ) = {
+  assert(namer != none, message: "Missing argument 'namer'")
+  assert(tagger != none, message: "Missing argument 'tagger'")
   (class, item, id, index, conf-language) => {
     // handle automatic language
     let lang = language
@@ -115,7 +122,8 @@
       tagger(class, item, id, index),
       [#class.root-class-name "#namer(class, item, id, index)"],
       lang,
-      breakable,
+      breakable: breakable,
+      justify: justify,
       style: style,
     )
   }
@@ -127,16 +135,19 @@
 /// The table's label will have the form `srs:<tag>`, where `<tag>` is the result of calling `tagger`.
 ///
 /// - tagger (function): Function to format the item's tag, of form `(class, item, id, index) -> str`.
-/// - breakable (bool): If the table can be broken in several pages.
 /// - language (str, auto): Language of the captions. If `auto`, it will use the one in `config.language`
+/// - breakable (bool): If the table can be broken in several pages.
+/// - justify (array): Justification of the two columns, e.g. (true, false)
 /// - style (dictionary): Parameters to pass to the table, e.g. `(columns: (1fr, 1fr), gutter: 1em)`
 /// -> function
 #let table-template-formatter-maker(
   tagger: none,
-  breakable: true,
   language: auto,
-  style: (columns: (8em, 1fr)),
+  breakable: false,
+  justify: (false, true),
+  style: (columns: 2),
 ) = {
+  assert(tagger != none, message: "Missing argument 'tagger'")
   (class, conf-language) => {
     // handle automatic language
     let lang = language
@@ -154,7 +165,8 @@
       tagger(class),
       locale.TEMPLATE.at(lang)(class.name, lower(class.root-class-name)),
       lang,
-      breakable,
+      breakable: breakable,
+      justify: justify,
       style: style,
     )
   }
@@ -173,7 +185,7 @@
 
 /// Returns a namer function that names the item with an incremental name, e.g. `<prefix><separator>0X`.
 ///
-/// - prefix (function, str): Prefix to use. Can be dynamic, if a function `(class, separator) -> str` is supplied, or static, if string.
+/// - prefix (function, str, none): Prefix to use. Can be dynamic, if a function `(class: dictionary, separator: str) -> str` is supplied, or static, if string, or `none`, in which case the tag will be just the ID.
 /// - separator (str): Separator between the prefix and name. If `prefix` is a function, this will be the argument passed.
 /// - start (int): Starting index.
 /// - width (int): Width of the index, which will be padded with zeroes.
@@ -184,8 +196,6 @@
   start: 1,
   width: 2,
 ) = {
-  assert(prefix != none, message: "Missing 'prefix' argument.")
-
   if type(prefix) == function {
     return (class, item, id, index) => {
       (
@@ -195,9 +205,9 @@
       )
     }
   }
-
   (class, item, id, index) => {
-    prefix + separator + left-pad(str(index + start), 2, "0")
+    let id = left-pad(str(index + start), 2, "0")
+    if prefix == none { id } else { prefix + separator + id }
   }
 }
 
@@ -205,22 +215,22 @@
 
 /// Returns a tagger function, which creates tags of form `<prefix><separator><id>`.
 ///
-/// - prefix (function, str): Prefix to use. Can be dynamic, if a function `(class, separator) -> str` is supplied, or static, if string.
+/// - prefix (function, str, none): Prefix to use. Can be dynamic, if a function `(class: dictionary, separator: str) -> str` is supplied, or static, if string, or `none`, in which case the tag will be just the ID.
 /// - separator (str): Separator between the prefix and name. If `prefix` is a function, this will be the argument passed.
 /// -> function
 #let item-tagger-maker(
   prefix: none,
   separator: "-",
 ) = {
-  assert(prefix != none, message: "Missing 'prefix' argument.")
-
   if type(prefix) == function {
     return (class, item, id, index) => {
       (prefix(class, separator) + separator + id)
     }
   }
 
-  (class, item, id, index) => { prefix + separator + id }
+  (class, item, id, index) => {
+    if prefix == none { id } else { prefix + separator + id }
+  }
 }
 
 /// Returns a tagger function, which creates tags of form `<class-name><separator>template`.
@@ -228,7 +238,9 @@
 /// - separator (str):
 /// -> function
 #let template-tagger-maker(separator: "-") = {
-  class => { lower(class.name) + separator + "template" }
+  class => {
+    lower(class.name.replace(" ", separator)) + separator + "template"
+  }
 }
 
 

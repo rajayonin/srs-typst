@@ -23,6 +23,7 @@
 /// - id (str): Item ID. This must be unique inside the class.
 /// - class (array): Item class, expressed as the class hierarchy
 /// - origins (array): Array of tags of items that give origin to this one.
+/// - fields (arguments): Fields of the item, according to the class, e.g. `Name: "Potato"`.
 /// -> dictionary
 #let make-item(id, class, origins: (), ..fields) = (
   id: id,
@@ -33,7 +34,7 @@
 
 
 
-/// Validates an item's fields are valid.
+/// Validates an item's fields.
 ///
 /// It returns a result. That is, a pair `(ok, err)` where `ok` is the result of
 /// the operation and `err` is the error message in case of error.

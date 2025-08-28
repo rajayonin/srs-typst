@@ -5,8 +5,16 @@
 
 
 #let TEMPLATE = (
-  en: (name, root-class) => { ["#name" #root-class template] },
-  es: (name, root-class) => { [Plantilla de #root-class "#name"] },
+  en: (name, root-class) => {
+    if lower(name).contains(lower(root-class)) {
+      ["#name" template]
+    } else ["#name" #root-class template]
+  },
+  es: (name, root-class) => {
+    if lower(name).contains(lower(root-class)) {
+      [Plantilla de "#name"]
+    } else [Plantilla de #root-class "#name"]
+  },
 )
 
 #let FIELD = (
