@@ -29,11 +29,19 @@
   ),
 )
 
-#srs.show-template(reqs, srs.make-tag("R", "U"))
 
-@srs:user-template
+// #reqs.config
+// #reqs.items
+
+#srs.show-template(reqs, srs.make-tag("R", "U"), "srs:RU-template")
+@srs:RU-template
 
 #srs.show-items(reqs, srs.make-tag("R", "U", "RE"))
-
 @srs:R-U-RE-user-req
+
+#srs.show-template(reqs, srs.make-tag("R", "S"), "srs:RS-template")
+@srs:RU-template
+
+#srs.show-items(reqs, srs.make-tag("R", "S", "NF"))
+@srs:R-S-NF-cool-req
 

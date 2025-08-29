@@ -22,6 +22,8 @@
         != (
           "id",
           "name",
+          "namer",
+          "labler",
           "classes",
           "fields",
           "origins",
@@ -73,6 +75,24 @@
       "Invalid class '"
         + class.id
         + "': Invalid format. `origins` is not a dictionary.",
+    )
+  }
+
+  if type(class.namer) != function {
+    return (
+      false,
+      "Invalid class '"
+        + class.id
+        + "': Invalid format. `namer` is not a function.",
+    )
+  }
+
+  if type(class.labler) != function {
+    return (
+      false,
+      "Invalid class '"
+        + class.id
+        + "': Invalid format. `labler` is not a function.",
     )
   }
 
@@ -165,14 +185,14 @@
 ///
 /// Each class must be generated using `make-class`.
 /// - language (str, none):
-/// - item-formatter (function, none): Default formatter for items, of form `(class: dictionary, item: dictionary, id: str, index: int) -> content`.
-/// - template-formatter (function, none): Default formatter for templates, of form `(class: dictionary) -> content`
+/// - item-formatter (function, none): Default item formatter, of form `(class: array, id: str, item: dictionary, index: int, config: dict, items: dictionary) -> content`.
+/// - template-formatter (function, none): Default template formatter, of form `(config: dict, tag: array, id: str) -> content`.
 /// - classes (array): Classes to use.
 /// -> dictionary
 #let make-config(
-  language: none,
   item-formatter: none,
   template-formatter: none,
+  language: none,
   classes: (),
 ) = (
   language: language,
@@ -232,6 +252,8 @@
 ///
 /// - id (str): Class short identifier. Typically the first letter of the name, e.g. `"R"`.
 /// - name (str): Class name.
+/// - namer (function, auto): `(tag: array, id: str, fields: dictionary, index: int, root-class-name: str, class-name: str) -> str`.
+/// - labler (function, auto): `(tag: array, id: str, fields: dictionary, index: int, root-class-name: str, class-name: str) -> str`.
 /// - fields (dictionary): Set of fields that apply to the class. Generate them using `make-field`.
 /// - classes (dictionary): sub-classes belonging to this class. Fields belonging to this class are inherited by classes. Generate them using `make-class`.
 /// - origins (dictionary): List of classes that are the origin to this class. Note that *only* a "terminal class", that is, a *class without classes* can have origins. Generate them using `make-origins`.
@@ -239,10 +261,14 @@
 #let make-class(
   id,
   name,
+  namer,
+  labler,
   fields: (),
   classes: (),
   origins: (:),
 ) = {
+  // TODO: auto namer/labler inherits
+
   // parameter validation
   assert(type(id) == str, message: "Invalid format. `id` is not a string.")
   assert(type(name) == str, message: "Invalid format. `name` is not a string.")
@@ -253,6 +279,14 @@
   assert(
     type(classes) == array,
     message: "Invalid format. `classes` is not an array.",
+  )
+  assert(
+    type(namer) == function,
+    message: "Invalid format. `namer` is not a function",
+  )
+  assert(
+    type(labler) == function,
+    message: "Invalid format. `labler` is not a function",
   )
 
   // check origins
@@ -272,6 +306,8 @@
   (
     id: id,
     name: name,
+    namer: namer,
+    labler: labler,
     classes: classes,
     fields: fields,
     origins: origins,

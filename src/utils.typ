@@ -1,8 +1,8 @@
 // Map function similar to `arr.map(func)' but with an additional paramater to
 // `func': the index:
 //
-// - arr (array): Lista de entrada
-// - func (function): ((any, int) -> any)
+// - arr (array): Input list.
+// - func (function): `((any, int) -> any)`
 // -> any
 #let mapi(arr, func) = {
   let result = ()

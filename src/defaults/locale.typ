@@ -26,3 +26,8 @@
   en: "Description",
   es: "Descripción",
 )
+
+#let ORIGINS = (
+  en: "Origins",
+  es: "Orígenes",
+)
