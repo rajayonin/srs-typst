@@ -30,7 +30,7 @@
 ///
 /// - reqs (dictionary): Requirements object.
 /// - tag (array): Item class tag, use `make-tag` to generate it. Must be a terminal class.
-/// - formatter (function, auto): Formatter function, of format `(class: array, id: str, item: dictionary, index: int, config: dict, items: dictionary) -> content`. If `auto`, it uses the configuration's default `item-formatter`.
+/// - formatter (function, auto): Formatter function, of format `(class-tag: array, id: str, item: dictionary, index: int, config: dict, items: dictionary) -> content`. If `auto`, it uses the configuration's default `item-formatter`.
 /// -> content
 #let show-items(reqs, tag, formatter: auto) = {
   if formatter == auto {

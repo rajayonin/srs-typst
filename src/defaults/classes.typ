@@ -40,8 +40,8 @@
   make-class(
     "R",
     "Requirement",
-    basic-item-namer,
-    basic-item-labler,
+    namer: basic-item-namer,
+    labler: basic-item-labler,
     fields: (
       make-field(
         "Description",
@@ -74,24 +74,18 @@
       make-class(
         "U",
         "User",
-        basic-item-namer,
-        basic-item-labler,
         classes: (
-          make-class("CA", "Capability", basic-item-namer, basic-item-labler),
-          make-class("RE", "Restriction", basic-item-namer, basic-item-labler),
+          make-class("CA", "Capability"),
+          make-class("RE", "Restriction"),
         ),
       ),
       make-class(
         "S",
         "Software",
-        basic-item-namer,
-        basic-item-labler,
         classes: (
           make-class(
             "FN",
             "Functional",
-            basic-item-namer,
-            basic-item-labler,
             origins: make-origins(
               [User requirements that derived this requirement.],
               make-tag("R", "U", "CA"),
@@ -100,8 +94,6 @@
           make-class(
             "NF",
             "Non-functional",
-            basic-item-namer,
-            basic-item-labler,
             origins: make-origins(
               [User requirements that derived this requirement.],
               make-tag("R", "U", "RE"),
@@ -114,8 +106,8 @@
   make-class(
     "U",
     "Use Case",
-    basic-item-namer,
-    basic-item-labler,
+    namer: basic-item-namer,
+    labler: basic-item-labler,
     fields: (
       make-field(
         "Name",
@@ -147,8 +139,8 @@
   make-class(
     "C",
     "Component",
-    basic-item-namer,
-    basic-item-labler,
+    namer: basic-item-namer,
+    labler: basic-item-labler,
     fields: (
       make-field(
         "Role",
@@ -180,8 +172,8 @@
   make-class(
     "T",
     "Test",
-    basic-item-namer,
-    basic-item-labler,
+    namer: basic-item-namer,
+    labler: basic-item-labler,
     fields: (
       make-field(
         "Description",
@@ -209,25 +201,21 @@
       make-class(
         "VAT",
         "Validation Test",
-        basic-item-namer,
-        basic-item-labler,
         origins: make-origins(
           [Requirement that originated this test.],
           make-tag("R", "S", "FN"),
           make-tag("R", "S", "NF"),
         ),
       ),
-    ),
-  ),
-  make-class(
-    "VET",
-    "Verification Test",
-    basic-item-namer,
-    basic-item-labler,
-    origins: make-origins(
-      [Requirement that originated this test.],
-      make-tag("R", "U", "CA"),
-      make-tag("R", "U", "RE"),
+      make-class(
+        "VET",
+        "Verification Test",
+        origins: make-origins(
+          [Requirement that originated this test.],
+          make-tag("R", "U", "CA"),
+          make-tag("R", "U", "RE"),
+        ),
+      ),
     ),
   ),
 )
@@ -247,8 +235,8 @@
   make-class(
     "R",
     "Requirements",
-    basic-item-namer,
-    basic-item-labler,
+    namer: basic-item-namer,
+    labler: basic-item-labler,
     fields: (
       make-field(
         "Description",
@@ -260,20 +248,14 @@
       make-class(
         "U",
         "User",
-        basic-item-namer,
-        basic-item-labler,
       ),
       make-class(
         "S",
         "Software",
-        basic-item-namer,
-        basic-item-labler,
         classes: (
           make-class(
             "FN",
             "Functional",
-            basic-item-namer,
-            basic-item-labler,
             origins: make-origins(
               [User requirements that derived this requirement.],
               make-tag("R", "U"),
@@ -282,8 +264,6 @@
           make-class(
             "NF",
             "Non-functional",
-            basic-item-namer,
-            basic-item-labler,
             origins: make-origins(
               [User requirements that derived this requirement.],
               make-tag("R", "U"),

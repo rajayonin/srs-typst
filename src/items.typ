@@ -3,6 +3,117 @@
 #import "config.typ": validate-config
 
 
+/* QUERY FUNCTIONS */
+
+/// Returns the class matching the tag.
+///
+/// - config (dictionary): Main config.
+/// - tag (array): Tag of the class to find.
+/// -> dictionary
+#let get-class(config, tag) = {
+  let current = config
+
+  for subtag in tag {
+    current = current.classes.find(x => x.id == subtag)
+    assert(
+      current != none,
+      message: "Couldn't find tag '" + tag.join("-") + "'.",
+    )
+  }
+
+  return current
+}
+
+
+/// This function returns an array of all the classes and subclasses of
+/// `config` following the path described by `tag`. For instance: if `tag`
+/// is `("R", "F")`, then the result will be an array of two elements: the
+/// class "R" and its child class "F".
+///
+/// - config (dictionary): The configuration lol
+/// - tag (array): The tag
+/// -> array
+#let tag-to-class-tree(config, tag) = {
+  let iter = config
+  let result = ()
+  for subtag in tag {
+    let found = none
+    for class in iter.classes { if class.id == subtag { found = class } }
+    assert(found != none, message: "Class tree couldn't be created")
+    iter = found
+    result.push(found)
+  }
+  return result
+}
+
+
+/// Obtains the namer and labler for a class, taking into account autos.
+///
+/// - config (dictionary): The full config
+/// - class (dictionary): The class
+/// -> (function, function)
+#let get-class-namer-labler(config, tag, class) = {
+  if class.namer == auto or class.labler == auto {
+    // inherit from ancestors
+    let namer
+    let labler
+    for c in tag-to-class-tree(config, tag).rev() {
+      if class.namer == auto and c.namer != auto { namer = c.namer }
+      if class.labler == auto and c.labler != auto { labler = c.labler }
+    }
+    return (namer, labler)
+  } else { return (class.namer, class.labler) }
+}
+
+
+
+/// This function merges all the fields of a class and subclasses identified
+/// by the `tag` into a big class which contains all the fields. The name of
+/// the resulting class is the name of the youngest child. This is a helper
+/// function.
+///
+/// - config (dictionary): Guess what?! The configuration! lmao
+/// - tag (array): Tag
+/// -> dictionary
+#let get-full-class(config, tag) = {
+  let classes = tag-to-class-tree(config, tag)
+  let cls = classes.last()
+  return (
+    name: cls.name,
+    root-class-name: classes.first().name,
+    tag: tag,
+    fields: classes.map(class => class.fields).flatten(),
+    namer: cls.namer,
+    labler: cls.labler,
+    origins: cls.origins,
+    terminal: cls.classes.len() == 0,
+  )
+}
+
+
+/// Returns all the items that belong to the given class given by the `tag`.
+///
+/// - items (dictionary): The item tree.
+/// - tag (array): The tag
+/// -> array
+#let get-all-items(items, tag) = {
+  let iter = items
+  for subtag in tag { iter = iter.at(subtag) }
+  return iter
+}
+
+/// Returns all the items that belong to the given class given by the `tag`.
+///
+/// - items (dictionary): The item tree.
+/// - class (array): The item's class.
+/// - id (str): The item's ID.
+/// -> array
+#let get-item(items, class, id) = get-all-items(items, class).at(id)
+
+
+
+/* CREATION */
+
 /// Creates an item belonging to the specified class. The specified fields are
 /// the ones belonging to the class.
 ///
@@ -54,7 +165,7 @@
       false,
       "Missing fields ("
         + class_fields
-          .filter(f => not item_fields.keys().contains(f.name))
+          .filter(f => not f.name in item_fields)
           .map(f => f.name)
           .join(", ")
         + ").",
@@ -70,9 +181,7 @@
 
     if field.value == "content" and type(value) != content {
       return (false, "Field '" + field.name + "' is not of type `content`.")
-    } else if (
-      type(field.value) == dictionary and not field.value.keys().contains(value)
-    ) {
+    } else if (type(field.value) == dictionary and not value in field.value) {
       return (
         false,
         "Invalid value for field '"
@@ -273,7 +382,7 @@
 
       if not overwrite {
         assert(
-          not current.at(class_id).keys().contains(item.id),
+          not item.id in current.at(class_id),
           message: "ID '"
             + item.id
             + "' already exists for class '"
@@ -329,7 +438,7 @@
   let (ok, err) = validate-config(config)
   assert(ok, message: "Invalid configuration: " + err)
 
-  // TODO: expand here auto namers & lablers (see _tag-to-class-tree)
+  // TODO: expand autos here instead of in formatters
 
   let tree = _create-tree-from-config(config)
 
@@ -351,88 +460,3 @@
   )
 }
 
-
-/// Returns the class matching the tag.
-///
-/// - config (dictionary): Main config.
-/// - tag (array): Tag of the class to find.
-/// -> dictionary
-#let get-class(config, tag) = {
-  let current = config
-
-  for subtag in tag {
-    current = current.classes.find(x => x.id == subtag)
-    assert(
-      current != none,
-      message: "Couldn't find tag '" + tag.join("-") + "'.",
-    )
-  }
-
-  return current
-}
-
-
-/// This function returns an array of all the classes and subclasses of
-/// `config` following the path described by `tag`. For instance: if `tag`
-/// is `("R", "F")`, then the result will be an array of two elements: the
-/// class "R" and its child class "F".
-///
-/// - config (dictionary): The configuration lol
-/// - tag (array): The tag
-/// -> array
-#let tag-to-class-tree(config, tag) = {
-  let iter = config
-  let result = ()
-  for subtag in tag {
-    let found = none
-    for class in iter.classes { if class.id == subtag { found = class } }
-    assert(found != none, message: "Class tree couldn't be created")
-    iter = found
-    result.push(found)
-  }
-  return result
-}
-
-
-/// This function merges all the fields of a class and subclasses identified
-/// by the `tag` into a big class which contains all the fields. The name of
-/// the resulting class is the name of the youngest child. This is a helper
-/// function.
-///
-/// - config (dictionary): Guess what?! The configuration! lmao
-/// - tag (array): Tag
-/// -> dictionary
-#let get-full-class(config, tag) = {
-  let classes = tag-to-class-tree(config, tag)
-  let cls = classes.last()
-  return (
-    name: cls.name,
-    root-class-name: classes.first().name,
-    tag: tag,
-    fields: classes.map(class => class.fields).flatten(),
-    namer: cls.namer,
-    labler: cls.labler,
-    origins: cls.origins,
-    terminal: cls.classes.len() == 0,
-  )
-}
-
-
-/// Returns all the items that belong to the given class given by the `tag`.
-///
-/// - items (dictionary): The item tree.
-/// - tag (array): The tag
-/// -> array
-#let get-all-items(items, tag) = {
-  let iter = items
-  for subtag in tag { iter = iter.at(subtag) }
-  return iter
-}
-
-/// Returns all the items that belong to the given class given by the `tag`.
-///
-/// - items (dictionary): The item tree.
-/// - class (array): The item's class.
-/// - id (str): The item's ID.
-/// -> array
-#let get-item(items, class, id) = get-all-items(items, class).at(id)

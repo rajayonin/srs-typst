@@ -1,33 +1,10 @@
 #import "../utils.typ": *
 #import "locale.typ" as locale
-#import "../items.typ": get-all-items, get-class, get-full-class
-
-
-
-/// This function creates a dummy item from a FULL class specification, where
-/// the values are just the description and, in enumerated-type values, possible values.
-///
-/// - class (dictionary): The FULL class specification.
-/// -> dictionary
-#let _class-as-template-item(class) = (
-  origins: class.origins.description,
-  fields: class
-    .fields
-    .map(field => {
-      (
-        field.name,
-        if type(field.value) == dictionary [
-          // for enumerated value types, include their default values
-          #field.description (#for (i, v) in (
-            field.value.values().enumerate()
-          ) [#emph(v)#if i != field.value.len() - 1 { ", " }])
-        ] else {
-          field.description
-        },
-      )
-    })
-    .to-dict(),
+#import "../items.typ": (
+  get-all-items, get-class, get-class-namer-labler, get-full-class,
+  tag-to-class-tree,
 )
+
 
 
 /// This function returns a labeled table with the specified `contents`.
@@ -88,7 +65,7 @@
   justify: (false, true),
   style: (columns: 2),
 ) = {
-  (class, id, item, index, config, items) => {
+  (class-tag, id, item, index, config, items) => {
     // handle automatic language
     let lang = language
     if language == auto {
@@ -100,7 +77,7 @@
       lang = conf-language
     }
 
-    let cls = get-full-class(config, class)
+    let cls = get-full-class(config, class-tag)
 
     // fields
     let contents = ()
@@ -140,49 +117,43 @@
 
               let origin-class = get-class(config, origin-tag)
 
-              [#link(
-                (origin-class.labler)(
-                  origin-tag,
-                  origin-id,
-                  origin-item.fields,
-                  origin-index,
-                  root-class-name,
-                  origin-class.name,
-                ),
-                (origin-class.namer)(
-                  origin-tag,
-                  origin-id,
-                  origin-item.fields,
-                  origin-index,
-                  root-class-name,
-                  origin-class.name,
-                ),
-              )]
+              let (origin-namer, origin-labler) = get-class-namer-labler(
+                config,
+                origin-tag,
+                origin-class,
+              )
+              let data = (
+                origin-tag,
+                origin-id,
+                origin-item.fields,
+                origin-index,
+                root-class-name,
+                origin-class.name,
+              )
+
+              [#link(label(origin-labler(..data)), origin-namer(..data))]
             },
           )
           .join([, ]),
       )
     }
 
+    // namer/labler
+    let (namer, labler) = get-class-namer-labler(config, class-tag, cls)
+    let data = (
+      class-tag,
+      id,
+      item.fields,
+      index,
+      cls.root-class-name,
+      cls.name,
+    )
+
 
     table-formatter(
       contents,
-      (cls.labler)(
-        class,
-        id,
-        item.fields,
-        index,
-        cls.root-class-name,
-        cls.name,
-      ),
-      [#cls.root-class-name "#(cls.namer)(
-          class,
-          id,
-          item.fields,
-          index,
-          cls.root-class-name,
-          cls.name,
-        )"],
+      labler(..data),
+      [#cls.root-class-name "#namer(..data)"],
       lang,
       breakable: breakable,
       justify: justify,
@@ -287,7 +258,7 @@
 /// -> function
 #let field-namer-maker(field-name) = {
   (tag, id, fields, index, root-class-name, class-name) => {
-    item.fields.at(field-name)
+    fields.at(field-name)
   }
 }
 
