@@ -7,6 +7,9 @@
   region: "es",
 )
 
+#show ref: set text(azuluc3m)
+#show link: set text(azuluc3m)
+
 #set list(marker: ([•], [--]), indent: 1em)
 
 #show figure: set figure.caption(position: top)
@@ -55,16 +58,9 @@
 #let config = srs.make-config(
   language: "es",
   template-formatter: srs.defaults.table-template-formatter-maker(
-    tagger: srs.defaults.template-tagger-maker(),
     style: (columns: (8em, 1fr), align: left),
   ),
   item-formatter: srs.defaults.table-item-formatter-maker(
-    namer: srs.defaults.incremental-namer-maker(
-      prefix: (class, _separator) => { class.tag.join("") },
-      start: 1,
-      width: 2,
-    ),
-    tagger: srs.defaults.item-tagger-maker(prefix: none),
     style: (columns: (8em, 1fr), align: left),
   ),
 
@@ -73,6 +69,14 @@
     srs.make-class(
       "R",
       "Requisito",
+      namer: srs.defaults.incremental-namer-maker(
+        prefix: (tag, root-class-name, class-name, separator) => {
+          tag.join("")
+        },
+        start: 1,
+        width: 2,
+      ),
+      labler: srs.defaults.item-labler-maker(prefix: "srs:", separator: ""),
       fields: (
         /* Requisito :: Descripción */
         srs.make-field(
@@ -127,6 +131,8 @@
     srs.make-class(
       "CU",
       "Caso de uso",
+      namer: srs.defaults.field-namer-maker("Nombre"),
+      labler: srs.defaults.item-labler-maker(prefix: "srs:", separator: ""),
       fields: (
         /* Caso de uso :: Nombre */
         srs.make-field(
@@ -212,6 +218,8 @@
     srs.make-class(
       "C",
       "Componente",
+      namer: srs.defaults.field-namer-maker("Nombre"),
+      labler: srs.defaults.item-labler-maker(prefix: "srs:", separator: ""),
       fields: (
         /* Componente :: Nombre */
         srs.make-field(
@@ -255,6 +263,12 @@
     srs.make-class(
       "T",
       "Test",
+      namer: srs.defaults.incremental-namer-maker(
+        prefix: (class, _separator) => { class.tag.join("") },
+        start: 1,
+        width: 2,
+      ),
+      labler: srs.defaults.item-labler-maker(prefix: none),
       origins: srs.make-origins(
         [Requisito del que se deriva este _test_.],
         srs.make-tag("R", "F"),
@@ -1171,46 +1185,42 @@
 )
 
 
-#srs.show-template(reqs, srs.make-tag("CU"))
-@srs:caso-de-uso-template
+#srs.show-template(reqs, srs.make-tag("CU"), "tab:cu")
+@tab:cu
 
 #srs.show-items(
   reqs,
   srs.make-tag("CU"),
   // custom formatter bc use cases are ✨special✨
   formatter: srs.defaults.table-item-formatter-maker(
-    namer: srs.defaults.field-namer-maker("Nombre"),
-    tagger: srs.defaults.item-tagger-maker(prefix: none),
     style: (columns: (8em, 1fr), align: left),
     breakable: true,
   ),
 )
 @srs:uc-detect
 
-#srs.show-template(reqs, srs.make-tag("R", "F"))
-@srs:requisito-funcionales-template
+#srs.show-template(reqs, srs.make-tag("R", "F"), "tab:rf")
+@tab:rf
 
 #srs.show-items(reqs, srs.make-tag("R", "F"))
 @srs:rf-binding
 
 
 === Requisitos no funcionales
-#srs.show-template(reqs, srs.make-tag("R", "N"))
-@srs:requisito-no-funcional-template
+#srs.show-template(reqs, srs.make-tag("R", "N"), "tab:rnf")
+@tab:rnf
 
 #srs.show-items(reqs, srs.make-tag("R", "N"))
 @srs:rnf-better
 
 
-#srs.show-template(reqs, srs.make-tag("C"))
-@srs:componente-template
+#srs.show-template(reqs, srs.make-tag("C"), "tab:comp")
+@tab:comp
 
 #srs.show-items(
   reqs,
   srs.make-tag("C"),
   formatter: srs.defaults.table-item-formatter-maker(
-    namer: srs.defaults.field-namer-maker("Nombre"),
-    tagger: srs.defaults.item-tagger-maker(prefix: none),
     style: (columns: (8em, 1fr), align: left),
     breakable: false,
   ),
