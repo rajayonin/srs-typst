@@ -10,7 +10,7 @@
 ///
 /// - reqs (dictionary): Requirements object.
 /// - tag (array): Item class tag, use `make-tag` to generate it.
-/// - id (str): ID to give to the template, typically the label of a figure.
+/// - id (str): ID to give to the template, typically used in the label of a figure.
 /// - formatter (function, auto): Formatter function, of format `(config: dict, tag: array, id: str) -> content`. If `auto`, it uses the configuration's default `template-formatter`.
 /// -> content
 #let show-template(reqs, tag, id, formatter: auto) = {

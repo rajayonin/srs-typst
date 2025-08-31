@@ -1,16 +1,21 @@
+//! Default formatters and auxiliar functions
+
+
 #import "../utils.typ": *
 #import "locale.typ" as locale
 #import "../items.typ": (
-  get-all-items, get-class, get-class-namer-labler, get-full-class,
-  tag-to-class-tree,
+  get-all-items, get-class, get-class-namer-identifier, get-full-class,
+  get-item-name-id, tag-to-class-tree,
 )
 
 
 
 /// This function returns a labeled table with the specified `contents`.
 ///
+/// The label will be `srs:<id>`.
+///
 /// - contents (array): The table's contents.
-/// - id (str): Label that will be applied to the figure.
+/// - id (str): Unique item ID, used in the label.
 /// - caption (content, str): The table's caption
 /// - language (str): Language to use.
 /// - breakable (bool): Whether the table can span multiple pages.
@@ -42,7 +47,7 @@
         ..contents,
       ),
     )
-    #label(id)
+    #label("srs:" + id)
   ]
 }
 
@@ -57,7 +62,7 @@
 /// - language (str, auto): Language of the captions. If `auto`, it will use the one in `config.language`
 /// - breakable (bool): If the table can be broken in several pages.
 /// - justify (array): Justification of the two columns, e.g. (true, false)
-/// - style (dictionary): Parameters to pass to the table, e.g. `(columns: (1fr, 1fr), gutter: 1em)`
+/// - style (dictionary): Parameters to pass to the table, e.g. `(columns: (1fr, 1fr), align: left, gutter: 1em)`
 /// -> function
 #let table-item-formatter-maker(
   language: auto,
@@ -85,9 +90,9 @@
       contents.push([#strong(class-field.name)])
 
       let value = item.fields.at(class-field.name, default: [])
-      if class-field.value == "content" or type(value) == content {
+      if class-field.value == "content" {
         contents.push(value)
-      } else {
+      } else if type(class-field.value) == dictionary {
         // enum
         contents.push([#class-field.value.at(value)])
       }
@@ -100,46 +105,20 @@
       contents.push(
         item
           .origins
-          .map(
-            origin => {
-              let origin-tag = origin.slice(0, -1)
-              let origin-id = origin.last()
-              let origin-class-items = get-all-items(items, origin-tag)
-
-              let origin-item = origin-class-items.at(origin-id)
-              let origin-index = origin-class-items
-                .keys()
-                .position(x => x == id)
-              let root-class-name = get-class(config, origin.slice(
-                0,
-                count: 1,
-              )).name
-
-              let origin-class = get-class(config, origin-tag)
-
-              let (origin-namer, origin-labler) = get-class-namer-labler(
-                config,
-                origin-tag,
-                origin-class,
-              )
-              let data = (
-                origin-tag,
-                origin-id,
-                origin-item.fields,
-                origin-index,
-                root-class-name,
-                origin-class.name,
-              )
-
-              [#link(label(origin-labler(..data)), origin-namer(..data))]
-            },
-          )
+          .map(origin-tag => {
+            let (origin-name, origin-id) = get-item-name-id(
+              config,
+              items,
+              origin-tag,
+            )
+            [#link(label("srs:" + origin-id), origin-name)]
+          })
           .join([, ]),
       )
     }
 
-    // namer/labler
-    let (namer, labler) = get-class-namer-labler(config, class-tag, cls)
+    // namer/identifier
+    let (namer, identifier) = get-class-namer-identifier(config, class-tag, cls)
     let data = (
       class-tag,
       id,
@@ -152,8 +131,8 @@
 
     table-formatter(
       contents,
-      labler(..data),
-      [#cls.root-class-name "#namer(..data)"],
+      identifier(..data),
+      [#cls.root-class-name "#namer(..data)"], // TODO: extract this as arg
       lang,
       breakable: breakable,
       justify: justify,
@@ -171,7 +150,7 @@
 /// - language (str, auto): Language of the captions. If `auto`, it will use the one in `config.language`
 /// - breakable (bool): If the table can be broken in several pages.
 /// - justify (array): Justification of the two columns, e.g. (true, false)
-/// - style (dictionary): Parameters to pass to the table, e.g. `(columns: (1fr, 1fr), gutter: 1em)`
+/// - style (dictionary): Parameters to pass to the table, e.g. `(columns: (1fr, 1fr), align: left, gutter: 1em)`
 /// -> function
 #let table-template-formatter-maker(
   language: auto,
@@ -223,7 +202,7 @@
     table-formatter(
       contents,
       id,
-      locale.TEMPLATE.at(lang)(class.name, lower(class.root-class-name)),
+      locale.TEMPLATE.at(lang)(class.name, lower(class.root-class-name)), // TODO: extract this as arg
       lang,
       breakable: breakable,
       justify: justify,
@@ -232,20 +211,6 @@
   }
 }
 
-
-/// Basic item formatter, which creates tables.
-///
-/// Each table has a label and can be referenced with its class path and id, separated by `-`.
-///
-/// -> function
-#let basic-item-formatter = table-item-formatter-maker()
-
-/// Basic item formatter, which creates tables.
-///
-/// Each table has a label and can be referenced with its class path and id, separated by `-`.
-///
-/// -> function
-#let basic-template-formatter = table-template-formatter-maker()
 
 
 
@@ -293,26 +258,17 @@
 }
 
 
-#let basic-item-namer = incremental-namer-maker(
-  prefix: (tag, root-class-name, class-name, separator) => {
-    tag.join(separator)
-  },
-  separator: "-",
-  start: 1,
-  width: 2,
-)
-
 
 
 /* LABLERS */
 
 
-/// Returns a labler function, which creates tags of form `<prefix><separator><id>`.
+/// Returns a identifier function, which creates tags of form `<prefix><separator><id>`.
 ///
 /// - prefix (function, str, none): Prefix to use. Can be dynamic, if a function `(tag: array, root-class-name: str, class-name: str, separator: str) -> str` is supplied, or static, if string, or `none`, in which case the tag will be just the ID.
 /// - separator (str): Separator between the prefix and name. If `prefix` is a function, this will be the argument passed.
 /// -> function
-#let item-labler-maker(
+#let identifier-maker(
   prefix: none,
   separator: "-",
 ) = {
@@ -329,10 +285,3 @@
   }
 }
 
-
-#let basic-item-labler = item-labler-maker(
-  prefix: (tag, root-class-name, class-name, separator) => {
-    "srs:" + tag.join(separator)
-  },
-  separator: "-",
-)

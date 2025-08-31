@@ -1,3 +1,6 @@
+//! Default classes
+
+
 #import "../config.typ": *
 #import "formatters.typ": *
 
@@ -13,6 +16,23 @@
   c: "Constant",
   i: "Inconstant",
   vu: "Very unstable",
+)
+
+
+#let basic-item-namer = incremental-namer-maker(
+  prefix: (tag, root-class-name, class-name, separator) => {
+    tag.join(separator)
+  },
+  separator: "-",
+  start: 1,
+  width: 2,
+)
+
+#let basic-item-identifier = identifier-maker(
+  prefix: (tag, root-class-name, class-name, separator) => {
+    tag.join(separator)
+  },
+  separator: "-",
 )
 
 
@@ -41,7 +61,7 @@
     "R",
     "Requirement",
     namer: basic-item-namer,
-    labler: basic-item-labler,
+    identifier: basic-item-identifier,
     fields: (
       make-field(
         "Description",
@@ -107,7 +127,7 @@
     "U",
     "Use Case",
     namer: basic-item-namer,
-    labler: basic-item-labler,
+    identifier: basic-item-identifier,
     fields: (
       make-field(
         "Name",
@@ -140,7 +160,7 @@
     "C",
     "Component",
     namer: basic-item-namer,
-    labler: basic-item-labler,
+    identifier: basic-item-identifier,
     fields: (
       make-field(
         "Role",
@@ -173,7 +193,7 @@
     "T",
     "Test",
     namer: basic-item-namer,
-    labler: basic-item-labler,
+    identifier: basic-item-identifier,
     fields: (
       make-field(
         "Description",
@@ -236,7 +256,7 @@
     "R",
     "Requirements",
     namer: basic-item-namer,
-    labler: basic-item-labler,
+    identifier: basic-item-identifier,
     fields: (
       make-field(
         "Description",

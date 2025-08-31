@@ -1,5 +1,6 @@
 //! Functions for creating and managing items
 
+
 #import "config.typ": validate-config
 
 
@@ -47,22 +48,25 @@
 }
 
 
-/// Obtains the namer and labler for a class, taking into account autos.
+/// Obtains the namer and identifier for a class, taking into account autos.
 ///
 /// - config (dictionary): The full config
 /// - class (dictionary): The class
-/// -> (function, function)
-#let get-class-namer-labler(config, tag, class) = {
-  if class.namer == auto or class.labler == auto {
+/// -> array
+#let get-class-namer-identifier(config, tag, class) = {
+  if class.namer == auto or class.identifier == auto {
     // inherit from ancestors
-    let namer
-    let labler
+    let namer = none
+    let identifier = none
     for c in tag-to-class-tree(config, tag).rev() {
       if class.namer == auto and c.namer != auto { namer = c.namer }
-      if class.labler == auto and c.labler != auto { labler = c.labler }
+      if class.identifier == auto and c.identifier != auto {
+        identifier = c.identifier
+      }
+      if namer != none or identifier != none { break }
     }
-    return (namer, labler)
-  } else { return (class.namer, class.labler) }
+    return (namer, identifier)
+  } else { return (class.namer, class.identifier) }
 }
 
 
@@ -84,7 +88,7 @@
     tag: tag,
     fields: classes.map(class => class.fields).flatten(),
     namer: cls.namer,
-    labler: cls.labler,
+    identifier: cls.identifier,
     origins: cls.origins,
     terminal: cls.classes.len() == 0,
   )
@@ -105,10 +109,42 @@
 /// Returns all the items that belong to the given class given by the `tag`.
 ///
 /// - items (dictionary): The item tree.
-/// - class (array): The item's class.
+/// - class-tag (array): The item's class.
 /// - id (str): The item's ID.
 /// -> array
-#let get-item(items, class, id) = get-all-items(items, class).at(id)
+#let get-item(items, class-tag, id) = get-all-items(items, class-tag).at(id)
+
+
+/// Returns the name and label of the specified item.
+///
+/// - config (dictionary): Full config.
+/// - items (dictionary): Full item tree.
+/// - tag (array): Full item tag, including its ID.
+/// -> array
+#let get-item-name-id(config, items, tag) = {
+  let class-tag = tag.slice(0, -1)
+  let id = tag.last()
+  let class-items = get-all-items(items, class-tag)
+
+  let class = get-class(config, class-tag)
+
+  let data = (
+    class-tag, // class-tag
+    id, // id
+    class-items.at(id).fields, // fields
+    class-items.keys().position(x => x == id), // index
+    get-class(config, tag.slice(0, count: 1)).name, // root-class-name
+    class.name, // class-name
+  )
+
+  let (namer, identifier) = get-class-namer-identifier(
+    config,
+    class-tag,
+    class,
+  )
+
+  (namer(..data), identifier(..data))
+}
 
 
 
@@ -283,7 +319,10 @@
     return (false, "Invalid format. `origins` is not an array.")
   }
 
-  // TODO: validate ID (no spaces)
+  // validate ID (no spaces)
+  if " " in item.id {
+    return (false, "Invalid ID. Spaces are not allowed in the ID.")
+  }
 
 
   // traverse config collecting the fields

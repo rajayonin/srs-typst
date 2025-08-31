@@ -4,8 +4,8 @@
 #let reqs = srs.create(
   config: srs.make-config(
     language: "en",
-    item-formatter: srs.defaults.basic-item-formatter,
-    template-formatter: srs.defaults.basic-template-formatter,
+    item-formatter: srs.defaults.table-item-formatter-maker(),
+    template-formatter: srs.defaults.table-template-formatter-maker(),
     classes: srs.defaults.base-classes,
   ),
   srs.make-item(
@@ -33,13 +33,13 @@
 // #reqs.config
 // #reqs.items
 
-#srs.show-template(reqs, srs.make-tag("R", "U"), "srs:RU-template")
+#srs.show-template(reqs, srs.make-tag("R", "U"), "RU-template")
 @srs:RU-template
 
 #srs.show-items(reqs, srs.make-tag("R", "U", "RE"))
 @srs:R-U-RE-user-req
 
-#srs.show-template(reqs, srs.make-tag("R", "S", "NF"), "srs:RS-template")
+#srs.show-template(reqs, srs.make-tag("R", "S", "NF"), "RS-template")
 @srs:RU-template
 
 #srs.show-items(reqs, srs.make-tag("R", "S", "NF"))

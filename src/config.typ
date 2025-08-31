@@ -24,7 +24,7 @@
           "id",
           "name",
           "namer",
-          "labler",
+          "identifier",
           "classes",
           "fields",
           "origins",
@@ -79,7 +79,7 @@
     )
   }
 
-  // labler/namer
+  // identifier/namer
 
   if class.namer == auto and root {
     return (
@@ -99,21 +99,21 @@
     )
   }
 
-  if class.labler == auto and root {
+  if class.identifier == auto and root {
     return (
       false,
       "Invalid class '"
         + class.id
-        + "': Invalid format. `labler` can't be set to `auto` for a root class.",
+        + "': Invalid format. `identifier` can't be set to `auto` for a root class.",
     )
   }
 
-  if type(class.labler) != function and class.namer != auto {
+  if type(class.identifier) != function and class.namer != auto {
     return (
       false,
       "Invalid class '"
         + class.id
-        + "': Invalid format. `labler` is not a function.",
+        + "': Invalid format. `identifier` is not a function.",
     )
   }
 
@@ -273,8 +273,8 @@
 ///
 /// - id (str): Class short identifier. Typically the first letter of the name, e.g. `"R"`.
 /// - name (str): Class name.
-/// - namer (function, auto): `(tag: array, id: str, fields: dictionary, index: int, root-class-name: str, class-name: str) -> str`. If `auto`, it inherits from its ancestors (root classes can't set it as `auto`).
-/// - labler (function, auto): `(tag: array, id: str, fields: dictionary, index: int, root-class-name: str, class-name: str) -> str`. If `auto`, it inherits from its ancestors (root classes can't set it as `auto`).
+/// - namer (function, auto): Function that gives a display name to the items of the class, of form `(class-tag: array, id: str, fields: dictionary, index: int, root-class-name: str, class-name: str) -> str`. If `auto`, it inherits from its ancestors (root classes can't set it as `auto`).
+/// - identifier (function, auto): Function that gives an unique identifier to each item of the class, of form `(class-tag: array, id: str, fields: dictionary, index: int, root-class-name: str, class-name: str) -> str`. If `auto`, it inherits from its ancestors (root classes can't set it as `auto`).
 /// - fields (dictionary): Set of fields that apply to the class. Generate them using `make-field`.
 /// - classes (dictionary): sub-classes belonging to this class. Fields belonging to this class are inherited by classes. Generate them using `make-class`.
 /// - origins (dictionary): List of classes that are the origin to this class. Note that *only* a "terminal class", that is, a *class without classes* can have origins. Generate them using `make-origins`.
@@ -283,7 +283,7 @@
   id,
   name,
   namer: auto,
-  labler: auto,
+  identifier: auto,
   fields: (),
   classes: (),
   origins: (:),
@@ -304,8 +304,8 @@
     message: "Invalid format. `namer` is not a function",
   )
   assert(
-    namer == auto or type(labler) == function,
-    message: "Invalid format. `labler` is not a function",
+    namer == auto or type(identifier) == function,
+    message: "Invalid format. `identifier` is not a function",
   )
 
   // check origins
@@ -326,7 +326,7 @@
     id: id,
     name: name,
     namer: namer,
-    labler: labler,
+    identifier: identifier,
     classes: classes,
     fields: fields,
     origins: origins,

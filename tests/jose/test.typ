@@ -76,7 +76,7 @@
         start: 1,
         width: 2,
       ),
-      labler: srs.defaults.item-labler-maker(prefix: "srs:", separator: ""),
+      identifier: srs.defaults.identifier-maker(prefix: none),
       fields: (
         /* Requisito :: Descripción */
         srs.make-field(
@@ -132,7 +132,7 @@
       "CU",
       "Caso de uso",
       namer: srs.defaults.field-namer-maker("Nombre"),
-      labler: srs.defaults.item-labler-maker(prefix: "srs:", separator: ""),
+      identifier: srs.defaults.identifier-maker(prefix: none),
       fields: (
         /* Caso de uso :: Nombre */
         srs.make-field(
@@ -219,7 +219,7 @@
       "C",
       "Componente",
       namer: srs.defaults.field-namer-maker("Nombre"),
-      labler: srs.defaults.item-labler-maker(prefix: "srs:", separator: ""),
+      identifier: srs.defaults.identifier-maker(prefix: none),
       fields: (
         /* Componente :: Nombre */
         srs.make-field(
@@ -268,7 +268,7 @@
         start: 1,
         width: 2,
       ),
-      labler: srs.defaults.item-labler-maker(prefix: none),
+      identifier: srs.defaults.identifier-maker(prefix: none),
       origins: srs.make-origins(
         [Requisito del que se deriva este _test_.],
         srs.make-tag("R", "F"),
@@ -1185,8 +1185,8 @@
 )
 
 
-#srs.show-template(reqs, srs.make-tag("CU"), "tab:cu")
-@tab:cu
+#srs.show-template(reqs, srs.make-tag("CU"), "cu-template")
+@srs:cu-template
 
 #srs.show-items(
   reqs,
@@ -1199,23 +1199,23 @@
 )
 @srs:uc-detect
 
-#srs.show-template(reqs, srs.make-tag("R", "F"), "tab:rf")
-@tab:rf
+#srs.show-template(reqs, srs.make-tag("R", "F"), "rf-template")
+@srs:rf-template
 
 #srs.show-items(reqs, srs.make-tag("R", "F"))
 @srs:rf-binding
 
 
 === Requisitos no funcionales
-#srs.show-template(reqs, srs.make-tag("R", "N"), "tab:rnf")
-@tab:rnf
+#srs.show-template(reqs, srs.make-tag("R", "N"), "rnf-template")
+@srs:rnf-template
 
 #srs.show-items(reqs, srs.make-tag("R", "N"))
 @srs:rnf-better
 
 
-#srs.show-template(reqs, srs.make-tag("C"), "tab:comp")
-@tab:comp
+#srs.show-template(reqs, srs.make-tag("C"), "comp-template")
+@srs:comp-template
 
 #srs.show-items(
   reqs,
