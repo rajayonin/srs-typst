@@ -5,7 +5,7 @@
 #import "locale.typ" as locale
 #import "../items.typ": (
   get-all-items, get-class, get-class-namer-identifier, get-full-class,
-  get-item-name-id, tag-to-class-tree,
+  get-item, get-item-name-id, tag-to-class-tree,
 )
 
 
@@ -51,8 +51,102 @@
   ]
 }
 
-
+#let traceability-table-formatter(
+  contents,
+  id,
+  caption,
+  language,
+  breakable: false,
+  rotation-angle: 0deg,
+  displacement: -0em,
+  style: none,
+  column_size: auto,
+) = {
+  if rotation-angle == 0deg {
+    displacement = 0em
+  }
+  // Wrap traceability matrix in a figure with label
+  show figure: set block(breakable: breakable)
+  // Center all cells for matrix layout
+  show table.cell: set align(center)
+  // Determine number of columns from header row
+  let ncols = contents.at(0).len()
+  // Build an array of 1fr repeated for each column
+  let columns = ()
+  for _ in range(ncols) {
+    columns.push(8em) // 1fr or 8em, for a good fit
+  }
+  let header-row = contents.at(0)
+  let processed-headers = header-row
+    .enumerate()
+    .map(pair => {
+      let (i, header) = pair
+      if i > 0 {
+        table.cell(
+          align: center,
+          inset: auto,
+        )[#move(
+          dy: displacement,
+        )[#rotate(rotation-angle)[#header]]]
+      } else if i == 0 {
+        // First cell gets no top/left borders
+        table.cell(stroke: (
+          top: none,
+          left: none,
+        ))[#header]
+      } else {
+        header
+      }
+    })
+  [
+    #figure(
+      caption: caption,
+      table(
+        stroke: (x, y) => {
+          let default_stroke = 1pt + black
+          if x == 0 and y == 0 {
+            // Top-left cell: no top or left borders
+            (
+              top: none,
+              left: none,
+              right: default_stroke,
+              bottom: default_stroke,
+            )
+          } else if x == 0 and y > 0 {
+            // First column (row headers): no left border
+            (
+              top: default_stroke,
+              left: none,
+              right: default_stroke,
+              bottom: default_stroke,
+            )
+          } else if y == 0 and x > 0 {
+            // First row (column headers): no top border
+            (
+              top: none,
+              left: default_stroke,
+              right: default_stroke,
+              bottom: default_stroke,
+            )
+          } else {
+            default_stroke
+          }
+        },
+        ..style,
+        columns: columns,
+        // First row of contents is header
+        table.header(
+          ..processed-headers,
+        ),
+        // Remaining rows are data rows - flatten them
+        ..contents.slice(1).flatten(),
+      ),
+    )
+    #label("srs:" + id)
+  ]
+}
 /* FORMATTERS */
+
 
 
 /// Returns an item formatter that formats the item as a table.
@@ -213,6 +307,93 @@
 
 
 
+#let table-traceability-formatter-maker(
+  language: auto,
+  breakable: false,
+  marker: sym.checkmark,
+  rotation-angle: 0deg,
+  style: none,
+  column_size: auto,
+) = {
+  (reqs, tag, comparing-tag) => {
+    // Handle automatic language - early return pattern
+    let lang = if language == auto {
+      let conf-language = reqs.config.at("language", default: none)
+      assert(
+        conf-language != none,
+        message: "Can't set `language` to `auto`. Found no `language` in the configuration",
+      )
+      conf-language
+    } else {
+      language
+    }
+
+    // Get classes and items once
+    let class = get-full-class(reqs.config, tag)
+    let comparing-class = get-full-class(reqs.config, comparing-tag)
+    let class-items = get-all-items(reqs.items, tag)
+    let comparing-items = get-all-items(reqs.items, comparing-tag)
+
+    // Pre-compute all column data
+    let column-data = comparing-items
+      .keys()
+      .map(col-id => {
+        let col-tag = (..comparing-tag, col-id)
+        let (name, id) = get-item-name-id(reqs.config, reqs.items, col-tag)
+        (tag: col-tag, name: name, id: col-id)
+      })
+
+    // Pre-compute all row data
+    let row-data = class-items
+      .keys()
+      .map(row-id => {
+        let row-tag = (..tag, row-id)
+        let (name, id) = get-item-name-id(reqs.config, reqs.items, row-tag)
+        let item = class-items.at(row-id)
+        let origins = if "origins" in item and item.origins != none {
+          item.origins
+        } else { () }
+        (tag: row-tag, name: name, id: id, item: item, origins: origins)
+      })
+
+    // Building the header row
+    let header-row = ([],) + column-data.map(col => col.name)
+
+    // Build data rows
+    let data-rows = row-data.map(row => {
+      let row-cells = (link((label("srs:" + row.id)), row.name),)
+
+      // Check relationships for all columns at once
+      for col in column-data {
+        let has-relationship = row.origins.contains(col.tag)
+        row-cells.push(if has-relationship [#marker] else [])
+      }
+
+      row-cells
+    })
+
+    // Generate matrix ID and caption
+    let matrix-id = (
+      tag.join("-") + "-traceability"
+    )
+    let caption = [
+      #locale.TRACEABILITY_MATRIX.at(lang), #class.name vs #comparing-class.name
+    ]
+
+    // Return formatted table
+    traceability-table-formatter(
+      (header-row,) + data-rows,
+      matrix-id,
+      caption,
+      lang,
+      breakable: breakable,
+      rotation-angle: rotation-angle,
+      style: style,
+      column_size: column_size,
+    )
+  }
+}
+
 
 /* NAMERS */
 
@@ -241,18 +422,19 @@
   separator: "-",
   start: 1,
   width: 2,
+  fillchar: "0",
 ) = {
   if type(prefix) == function {
     return (tag, id, fields, index, root-class-name, class-name) => {
       (
         prefix(tag, root-class-name, class-name, separator)
           + separator
-          + left-pad(str(index + start), 2, "0")
+          + left-pad(str(index + start), width, fillchar)
       )
     }
   }
   (tag, id, fields, index, root-class-name, class-name) => {
-    let id = left-pad(str(index + start), 2, "0")
+    let id = left-pad(str(index + start), width, fillchar)
     if prefix == none { id } else { prefix + separator + id }
   }
 }

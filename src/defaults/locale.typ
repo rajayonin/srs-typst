@@ -31,3 +31,8 @@
   en: "Origins",
   es: "Orígenes",
 )
+
+#let TRACEABILITY_MATRIX = (
+  en: "Traceability Matrix",
+  es: "Matriz de Trazabilidad",
+)
