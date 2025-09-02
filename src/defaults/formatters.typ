@@ -74,7 +74,7 @@
   // Build an array of 1fr repeated for each column
   let columns = ()
   for _ in range(ncols) {
-    columns.push(8em) // 1fr or 8em, for a good fit
+    columns.push(column_size) // 1fr or 8em, for a good fit
   }
   let header-row = contents.at(0)
   let processed-headers = header-row
@@ -340,7 +340,7 @@
       .map(col-id => {
         let col-tag = (..comparing-tag, col-id)
         let (name, id) = get-item-name-id(reqs.config, reqs.items, col-tag)
-        (tag: col-tag, name: name, id: col-id)
+        (tag: col-tag, name: name, id: id)
       })
 
     // Pre-compute all row data
@@ -356,8 +356,10 @@
         (tag: row-tag, name: name, id: id, item: item, origins: origins)
       })
 
-    // Building the header row
-    let header-row = ([],) + column-data.map(col => col.name)
+    // Building the header row with links
+    let header-row = (
+      ([],) + column-data.map(col => link(label("srs:" + col.id), col.name))
+    )
 
     // Build data rows
     let data-rows = row-data.map(row => {

@@ -77,7 +77,7 @@
 
   // infer comparing-tag if needed
   if comparing-tag == auto {
-    let cls = get-full-class(reqs.config, tag)
+    let cls = get-class(reqs.config, tag)
     assert(
       cls.origins.tags.len() != 0,
       message: "Can't infer `comparing-tag` automatically: class has no `origins.tags`.",
