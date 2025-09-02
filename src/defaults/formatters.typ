@@ -51,6 +51,21 @@
   ]
 }
 
+
+/// This function returns a labeled table with the specified `contents` for an n*m sized matrix.
+///
+/// The label will be `srs:<id>`.
+///
+/// - contents (array): The table's contents.
+/// - id (str): Unique item ID, used in the label.
+/// - caption (content, str): The table's caption
+/// - language (str): Language to use.
+/// - breakable (bool): Whether the table can span multiple pages.
+/// - rotation-angle (angle): Rotation angle for the table headers.
+/// - displacement (length): Displacement for the table headers (used normally in conjunction with rotate).
+/// - style (dictionary): Parameters to pass to the table, e.g. `(columns: (1fr, 1fr), gutter: 1em)`
+/// - column-size (length): Size of the columns in the table.
+/// -> content
 #let traceability-table-formatter(
   contents,
   id,
@@ -306,7 +321,17 @@
 }
 
 
-
+/// Returns a traceability matrix formatter that formats the relationship between two classes as a table.
+///
+/// This formatter will create a table that shows the relationships between the fields of the two classes,
+/// indicating which fields in the first class are related to which fields in the second class.
+/// - language (str, auto): Language of the captions. If `auto`, it will use the one in `config.language`
+/// - breakable (bool): If the table can be broken in several pages.
+/// - marker (symbol): Symbol to use for marking related fields.
+/// - rotation-angle (angle): Rotation angle for the table headers.
+/// - style (dictionary): Parameters to pass to the table, e.g. `(align: center, gutter: 0em)`
+/// - column-size (length): Size of the columns in the table.
+/// -> function
 #let table-traceability-formatter-maker(
   language: auto,
   breakable: false,
