@@ -65,16 +65,3 @@
 
 #srs.show-traceability(reqs, srs.make-tag("R", "S", "NF"))
 @srs:R-S-NF-traceability
-
-
-
-// si es auto te lo muestra TODO
-
-// hacer un formatter maker, que devuelve una barbaridad de cosas
-
-// hacer un formater que sea un class-tag, origin-class-tag (array)
-
-// hacer validaciones
-
-// que los origenes sean de la clase
-// Que se pueda
