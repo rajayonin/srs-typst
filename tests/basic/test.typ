@@ -49,7 +49,7 @@
 
 
 // #reqs.config
-#reqs.items
+// #reqs.items
 
 #srs.show-template(reqs, srs.make-tag("R", "U"), "RU-template")
 @srs:RU-template
