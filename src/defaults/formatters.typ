@@ -403,9 +403,8 @@
     let matrix-id = (
       tag.join("-") + "-traceability"
     )
-    let caption = [
-      #locale.TRACEABILITY_MATRIX.at(lang), #class.name vs #comparing-class.name
-    ]
+    let caption = [#locale.TRACEABILITY_MATRIX.at(lang), #class.name vs
+      #comparing-class.name]
 
     // Return formatted table
     traceability-table-formatter(
