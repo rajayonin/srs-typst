@@ -7,7 +7,7 @@ entrypoint = "src/lib.typ"
 authors = [
   "Luis Daniel Casais <https://github.com/rajayonin>",
   "José Antonio Verde <https://github.com/joseaverde>",
-  "Álvaro Guerrero <https://github.com/ALVAROPING1>"
+  "Eduardo Alarcón <https://github.com/Astrak00>"
 ]
 license = "Unlicense"
 description = "Support for Software Requirements Specification in Typst."
