@@ -1,7 +1,7 @@
 //! Functions for showing the items
 
 #import "utils.typ": *
-#import "items.typ": get-all-items, get-class, tag-to-class-tree
+#import "items.typ": get-all-items, get-class, get-full-class, tag-to-class-tree
 
 
 
@@ -64,3 +64,28 @@
   // }
 }
 
+#let show-traceability(reqs, tag, comparing-tag: auto, formatter: auto) = {
+  // choose formatter
+  if formatter == auto {
+    formatter = reqs.config.at("traceability-formatter", default: none)
+
+    assert(
+      formatter != auto,
+      message: "Can't set `formatter` to `auto`. Found no `traceability-formatter` in the configuration.",
+    )
+  }
+
+  // infer comparing-tag if needed
+  if comparing-tag == auto {
+    let cls = get-class(reqs.config, tag)
+    assert(
+      cls.origins.tags.len() != 0,
+      message: "Can't infer `comparing-tag` automatically: class has no `origins.tags`.",
+    )
+    comparing-tag = cls.origins.tags.at(0)
+  }
+
+
+  // delegate to formatter
+  formatter(reqs, tag, comparing-tag)
+}

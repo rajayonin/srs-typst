@@ -175,6 +175,15 @@
   if template-formatter != none and type(template-formatter) != function {
     return (false, "Invalid 'template-formatter'.")
   }
+  let traceability-formatter = config.at(
+    "traceability-formatter",
+    default: none,
+  )
+  if (
+    traceability-formatter != none and type(traceability-formatter) != function
+  ) {
+    return (false, "Invalid 'traceability-formatter'.")
+  }
 
   // TODO: more in-depht formatter validation, perhaps testing the function?
 
@@ -213,12 +222,14 @@
 #let make-config(
   item-formatter: none,
   template-formatter: none,
+  traceability-formatter: none,
   language: none,
   classes: (),
 ) = (
   language: language,
   item-formatter: item-formatter,
   template-formatter: template-formatter,
+  traceability-formatter: traceability-formatter,
   classes: classes,
 )
 

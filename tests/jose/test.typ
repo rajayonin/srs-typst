@@ -63,6 +63,11 @@
   item-formatter: srs.defaults.table-item-formatter-maker(
     style: (columns: (8em, 1fr), align: left),
   ),
+  traceability-formatter: srs.defaults.table-traceability-formatter-maker(
+    style: (row-gutter: 0em),
+    rotation-angle: 0deg,
+    column_size: 7em,
+  ),
 
   /* *** R e q u i s i t o s *** --------------------------------------- *** */
   classes: (
@@ -1226,3 +1231,7 @@
   ),
 )
 @srs:c-detector
+
+#srs.show-traceability(reqs, srs.make-tag("R", "N"))
+
+#srs.show-traceability(reqs, srs.make-tag("R", "F"))

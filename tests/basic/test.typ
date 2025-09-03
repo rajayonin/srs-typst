@@ -6,6 +6,11 @@
     language: "en",
     item-formatter: srs.defaults.table-item-formatter-maker(),
     template-formatter: srs.defaults.table-template-formatter-maker(),
+    traceability-formatter: srs.defaults.table-traceability-formatter-maker(
+      style: (row-gutter: 0em),
+      rotation-angle: 0deg,
+      column_size: 7em,
+    ),
     classes: srs.defaults.base-classes,
   ),
   srs.make-item(
@@ -27,7 +32,20 @@
     Stability: "c",
     Verifiability: "l",
   ),
+  srs.make-item(
+    "cool-req-patata",
+    srs.make-tag("R", "S", "NF"),
+    origins: (
+      srs.make-tag("R", "U", "RE", "user-req"),
+    ),
+    Description: [The software shall veryyy be cool.],
+    Necessity: "h",
+    Priority: "h",
+    Stability: "c",
+    Verifiability: "l",
+  ),
 )
+
 
 
 // #reqs.config
@@ -40,8 +58,10 @@
 @srs:R-U-RE-user-req
 
 #srs.show-template(reqs, srs.make-tag("R", "S", "NF"), "RS-template")
-@srs:RU-template
+@srs:RS-template
 
 #srs.show-items(reqs, srs.make-tag("R", "S", "NF"))
 @srs:R-S-NF-cool-req
 
+#srs.show-traceability(reqs, srs.make-tag("R", "S", "NF"))
+@srs:R-S-NF-traceability
