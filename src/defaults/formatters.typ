@@ -75,7 +75,7 @@
   rotation-angle: 0deg,
   displacement: -0em,
   style: none,
-  column_size: auto,
+  column-size: auto,
 ) = {
   if rotation-angle == 0deg {
     displacement = 0em
@@ -255,7 +255,6 @@
 ///
 /// The table's label will have the form `srs:<tag>`, where `<tag>` is the result of calling `tagger`.
 ///
-/// - tagger (function): Function to format the item's tag, of form `(class, item, id, index) -> str`.
 /// - language (str, auto): Language of the captions. If `auto`, it will use the one in `config.language`
 /// - breakable (bool): If the table can be broken in several pages.
 /// - justify (array): Justification of the two columns, e.g. (true, false)
@@ -338,7 +337,7 @@
   marker: sym.checkmark,
   rotation-angle: 0deg,
   style: none,
-  column_size: auto,
+  column-size: auto,
 ) = {
   (reqs, tag, comparing-tag) => {
     // Handle automatic language - early return pattern

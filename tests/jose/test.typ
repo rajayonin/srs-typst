@@ -66,7 +66,7 @@
   traceability-formatter: srs.defaults.table-traceability-formatter-maker(
     style: (row-gutter: 0em),
     rotation-angle: 0deg,
-    column_size: 7em,
+    column-size: 7em,
   ),
 
   /* *** R e q u i s i t o s *** --------------------------------------- *** */

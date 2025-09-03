@@ -3,6 +3,10 @@
 
 Support for Software Requirements Specification in Typst.
 
+> [!IMPORTANT]
+> This package is still in beta. Using it now means participating in its development.
+
+<!--
 ## Template adaptation checklist
 
 - [x] Fill out `README.md`
@@ -24,9 +28,15 @@ Support for Software Requirements Specification in Typst.
 - [ ] remove/replace the example test case
 - [ ] (add your actual code, docs and tests)
 - [ ] remove this section from the README
+-->
 
 ## Getting Started
 
+You can find examples in [`tests/basic/test.typ`](tests/basic/test.typ) and [`tests/jose/test.typ`](tests/jose/test.typ).
+
+You can find the reference documentation in [`docs/manual.pdf`](docs/manual.pdf).
+
+<!--
 These instructions will get you a copy of the project up and running on the typst web app. Perhaps a short code example on importing the package and a very simple teaser usage.
 
 ```typ
@@ -40,6 +50,7 @@ These instructions will get you a copy of the project up and running on the typs
   <source media="(prefers-color-scheme: dark)" srcset="./thumbnail-dark.svg">
   <img src="./thumbnail-light.svg">
 </picture>
+-->
 
 ### Installation
 
@@ -55,6 +66,13 @@ The installed version can be imported by prefixing the package name with `@local
 #import "@local/srs:0.1.0"
 ```
 
+Alternatively, just copy the contents of the `src/` directory to a `srs` subfolder of your project and:
+```typ
+#import "srs/lib.typ" as srs
+```
+
+
+<!--
 ## Usage
 
 A more in-depth description of usage. Any template arguments? A complicated example that showcases most if not all of the functions the package provides? This is also an excellent place to signpost the manual.
@@ -64,6 +82,8 @@ A more in-depth description of usage. Any template arguments? A complicated exam
 
 #let my-complicated-example = ...
 ```
+-->
+
 
 ## Additional Documentation and Acknowledgments
 
