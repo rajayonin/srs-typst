@@ -89,7 +89,7 @@
   // Build an array of 1fr repeated for each column
   let columns = ()
   for _ in range(ncols) {
-    columns.push(column_size) // 1fr or 8em, for a good fit
+    columns.push(column-size) // 1fr or 8em, for a good fit
   }
   let header-row = contents.at(0)
   let processed-headers = header-row
@@ -414,7 +414,7 @@
       breakable: breakable,
       rotation-angle: rotation-angle,
       style: style,
-      column_size: column_size,
+      column-size: column-size,
     )
   }
 }
