@@ -21,6 +21,7 @@
 /// - breakable (bool): Whether the table can span multiple pages.
 /// - justify (array): Justification of the two columns, e.g. (true, false)
 /// - style (dictionary): Parameters to pass to the table, e.g. `(columns: (1fr, 1fr), gutter: 1em)`
+/// - header-hline (boolean): Whether to include a `table.hline()` between after the header
 /// -> content
 #let table-formatter(
   contents,
@@ -30,20 +31,25 @@
   breakable: false,
   justify: (false, true),
   style: (columns: 2),
+  header-hline: false,
 ) = {
   show figure: set block(breakable: breakable)
   show table.cell.where(x: 0): set par(justify: justify.at(0))
   show table.cell.where(x: 1): set par(justify: justify.at(1))
+
+  let table-header = table.header(
+    [*#locale.FIELD.at(language)*],
+    [*#locale.DESCRIPTION.at(language)*],
+  )
 
   [
     #figure(
       caption: caption,
       table(
         ..style,
-        table.header(
-          [*#locale.FIELD.at(language)*],
-          [*#locale.DESCRIPTION.at(language)*],
-        ),
+        ..if header-hline { (table-header, table.hline()) } else {
+          (table-header,)
+        },
         ..contents,
       ),
     )
@@ -172,12 +178,14 @@
 /// - breakable (bool): If the table can be broken in several pages.
 /// - justify (array): Justification of the two columns, e.g. (true, false)
 /// - style (dictionary): Parameters to pass to the table, e.g. `(columns: (1fr, 1fr), align: left, gutter: 1em)`
+/// - header-hline (boolean): Whether to include a `table.hline()` between after the header
 /// -> function
 #let table-item-formatter-maker(
   language: auto,
   breakable: false,
   justify: (false, true),
   style: (columns: 2),
+  header-hline: false,
 ) = {
   (class-tag, id, item, index, config, items) => {
     // handle automatic language
@@ -246,6 +254,7 @@
       breakable: breakable,
       justify: justify,
       style: style,
+      header-hline: header-hline,
     )
   }
 }
@@ -259,12 +268,14 @@
 /// - breakable (bool): If the table can be broken in several pages.
 /// - justify (array): Justification of the two columns, e.g. (true, false)
 /// - style (dictionary): Parameters to pass to the table, e.g. `(columns: (1fr, 1fr), align: left, gutter: 1em)`
+/// - header-hline (boolean): Whether to include a `table.hline()` between after the header
 /// -> function
 #let table-template-formatter-maker(
   language: auto,
   breakable: false,
   justify: (false, true),
   style: (columns: 2),
+  header-hline: false,
 ) = {
   (config, tag, id) => {
     // handle automatic language
@@ -315,6 +326,7 @@
       breakable: breakable,
       justify: justify,
       style: style,
+      header-hline: header-hline,
     )
   }
 }
