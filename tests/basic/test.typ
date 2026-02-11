@@ -56,6 +56,7 @@
 
 #srs.show-items(reqs, srs.make-tag("R", "U", "RE"))
 @srs:R-U-RE-user-req
+#srs.show-ref(reqs, ("R", "U", "RE", "user-req"))
 
 #srs.show-template(reqs, srs.make-tag("R", "S", "NF"), "RS-template")
 @srs:RS-template
