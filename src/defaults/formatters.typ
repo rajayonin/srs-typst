@@ -108,7 +108,7 @@
           inset: auto,
         )[#move(
           dy: displacement,
-        )[#rotate(rotation-angle)[#header]]]
+        )[#rotate(rotation-angle, reflow: true)[#header]]]
       } else if i == 0 {
         // First cell gets no top/left borders
         table.cell(stroke: (
