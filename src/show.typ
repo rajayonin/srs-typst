@@ -97,8 +97,8 @@
 /// - tag (array): Item class tag, use `make-tag` to generate it.
 /// -> content
 #let show-ref(reqs, tag) = {
-  let (name, label) = get-item-name-id(reqs.config, reqs.items, tag)
+  let (name, id) = get-item-name-id(reqs.config, reqs.items, tag)
   let root-class-name = get-full-class(reqs.config, tag.at(0)).root-class-name
 
-  link(label, root-class-name + sym.space + name)
+  link(label("srs:" + id), root-class-name + sym.space + name)
 }
